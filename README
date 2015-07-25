@@ -1,0 +1,115 @@
+Tools for generating Traffic Matrices
+=====================================
+
+The code provided allows the user to generate two spatiotemporal
+traffic matrix models: the Modulated Gravity Model (MGM) and the
+Non-stationary Conditionally Independent Model (NCIM).
+
+The scripts for generating the models are as follows:
+1. modulated_gravity_model.m: MGM
+2. ncim.m: NCIM
+Note that both requires the generation of truncated normal random
+variables. We use the Hamiltonian Markov Chain implementation by
+Ari Pakman. This can be downloaded from 
+
+https://github.com/aripakman/hmc-tmg
+
+The scripts have been commented, so for usage, please use 
+"help <script-name>"
+
+Simple Example Script
+=====================
+An example generation of the traffic matrices is given by running
+simple_traffic_matrix_generator.m. This will produce a series of
+traffic matrices generated from the MGM, with the parameters 
+specified by the user in the script. See more detailed documentation
+in the script.
+
+These traffic matrices are modulated by a simple sinusoidal with
+a prescribed mean and peak-to-mean ratio. The script that
+generates this is called peak_mean_cycle.m. See the help for the
+script for more details.
+
+Abilene Example Script
+======================
+Another example generation of the traffic matrices is given by running
+abilene_traffic_matrix_generator.m. This will produce a series of
+traffic matrices generated from the MGM, with the parameters 
+specified by the user in the script. 
+
+This time, however, the total traffic is specified from a model fit
+based on the frequency model (Fourier-based) given by
+
+y = Dx + z,
+
+where y is Abilene's traffic, D is the Discrete Fourier Transform (DFT)
+dictionary, and z is a mean zero Gaussian distributed noise. 12 
+frequencies (including Abilene's mean traffic) were selected from D using an information criterion, the normalised Minimum Description Length (nMDL) criterion.  
+
+Abilene's traffic starts the 1st of March 2004. Each measurement interval is 5 minutes, and there are a total of 2016 data points (corresponding to one week).
+
+Analysis Script
+===============
+Principle Component Analysis (PCA) of the MGM and NCIM is performed
+in maxent_pca.m. This script generates the results as seen in 
+Section 4.3 of [1]. Detailed documentation is found within the 
+script. The user can adjust the variation parameter \sigma^2.
+
+This script requires the Abilene traffic contained in 
+tm_real.mat.
+
+Also provided are a script to construct sparse versions
+of a signal based on the nMDL information criterion. 
+
+1. fourier_nmdl.m: constructs a frequency sparse version of
+the original signal by selecting the optimal number of 
+frequencies, based on the nMDL criterion, and
+
+
+Case Study Script 
+=================
+Also provided is the script to generate PoP topologies as seen
+in Section 5 of [1]. This is performed by running the script
+
+GAmaxent_minimax.m
+
+The script can generate arbitrary locations within a prescribed
+region by setting preload_locations = 0 (found on line 50). 
+Otherwise, setting to 1 will use the topology featured in [1].
+
+The script requires the Combined Optimized Layered Design (COLD)
+algorithm, which can be obtained from 
+
+https://github.com/rhysbowden/COLD/
+
+The version we require is the minimax version of COLD for traffic 
+matrices, found in the branch COLD_minimax.
+
+The script requires computation of the link loads and the Floyd-
+Warshall algorithm. The implementations provided here were written
+by Yin Zhang at the University of Texas at Austin. Be sure to 
+compile the files by running
+
+mex calc_link_load.c
+mex floyd_apsp.c
+
+before running GAmaxent_minimax.m
+
+The default number of PoPs is 12, located in a 10 unit by 10 unit 
+square. The user can change the parameters within the script on 
+lines 53 to 57. Parameters for COLD are varied by modifying the
+parameters on line 71 to 74. 
+
+Associated scripts are:
+1. clustcoeff.m: Computes the Global Clustering Coefficient,
+2. cvnd.m: Computes the Coefficient of Variation of the node degree,
+3. diameter.m: Computes the network topology's diameter,
+4. link_length.m: Computes the link length,
+5. node_degree.m: Computes the node degree of a node, and
+6. simple_dijkstra.m: Runs a simple form of Dijkstra's algorithm.
+
+Citation
+========
+[1] Paul Tune and Matthew Roughan, "Spatiotemporal Traffic Matrix
+Synthesis", ACM SIGCOMM 2015, 17th to 21st August, 2015, London,
+United Kingdom.
